@@ -233,6 +233,12 @@
             </button>
         </div>
 
+        <div id="resetGradeContainer" style="text-align: center; margin-top: 20px;">
+            <button class="btn btn-secondary" onclick="resetGrades()">
+                🔄 אפס ניקוד
+            </button>
+        </div>
+
         <!-- Exercise 1: Mark numbers with specific digit -->
         <div id="exercise1" class="exercise-container">
             <button class="btn btn-secondary back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
@@ -340,6 +346,7 @@
 
         function startExercise(num) {
             document.getElementById('menu').style.display = 'none';
+            document.getElementById('resetGradeContainer').style.display = 'none';
             document.querySelectorAll('.exercise-container').forEach(el => el.classList.remove('active'));
             document.getElementById('exercise' + num).classList.add('active');
             state.currentExercise = num;
@@ -348,6 +355,7 @@
 
         function backToMenu() {
             document.getElementById('menu').style.display = 'grid';
+            document.getElementById('resetGradeContainer').style.display = 'block';
             document.querySelectorAll('.exercise-container').forEach(el => el.classList.remove('active'));
             state.currentExercise = null;
         }
@@ -356,6 +364,17 @@
             const score = state.scores[exerciseNum];
             document.getElementById('score' + exerciseNum).textContent =
                 `ניקוד: ${score.correct}/${score.total}`;
+        }
+
+        function resetGrades() {
+            if (confirm('האם אתה בטוח שאתה רוצה לאפס את הניקוד? ההיסטוריה תישמר.')) {
+                // Reset all scores to 0
+                for (let i = 1; i <= 5; i++) {
+                    state.scores[i] = {correct: 0, total: 0};
+                    updateScore(i);
+                }
+                alert('הניקוד אופס בהצלחה! 🎯');
+            }
         }
 
         function formatNumber(num) {
