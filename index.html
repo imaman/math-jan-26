@@ -515,11 +515,16 @@
         function generateExercise2() {
             const places = [1, 10, 100, 1000, 10000];
             const place = places[randomInt(0, places.length - 1)];
-            const num = randomInt(100000, 999999);
-            const increase = randomInt(1, 5);
 
-            const currentDigit = getDigitValue(num, place);
-            const newDigit = (currentDigit + increase) % 10;
+            // Generate a number and increase amount that won't cause carry-over
+            let num, increase, currentDigit, newDigit;
+            do {
+                num = randomInt(100000, 999999);
+                increase = randomInt(1, 5);
+                currentDigit = getDigitValue(num, place);
+                newDigit = currentDigit + increase;
+            } while (newDigit >= 10); // Ensure no carry-over
+
             const answer = setDigitValue(num, place, newDigit);
 
             state.currentQuestion = { place, num, increase, answer };
