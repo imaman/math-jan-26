@@ -416,7 +416,7 @@
             };
 
             document.getElementById('question1').innerHTML =
-                `<strong>סמן את כל המספרים שהספרה ב${digitNames[place]} שלהם היא ${targetDigit}:</strong>`;
+                `<strong>סמן את כל המספרים שערך הספרה ${targetDigit} הוא ${formatNumber(targetDigit * place)}:</strong>`;
 
             const optionsDiv = document.getElementById('options1');
             optionsDiv.innerHTML = '';
@@ -484,7 +484,7 @@
                 feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
                 feedbackDiv.className = 'feedback correct show';
             } else {
-                feedbackDiv.textContent = '💪 כמעט! נסה שוב בתרגיל הבא!';
+                feedbackDiv.textContent = '💙 כמעט! נסה שוב בתרגיל הבא!';
                 feedbackDiv.className = 'feedback incorrect show';
             }
 
@@ -535,7 +535,7 @@
                 feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
                 feedbackDiv.className = 'feedback correct show';
             } else {
-                feedbackDiv.textContent = `💪 ניסיון טוב! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
+                feedbackDiv.textContent = `💙 ניסיון טוב! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
                 feedbackDiv.className = 'feedback incorrect show';
             }
 
@@ -548,11 +548,29 @@
             const isNext = Math.random() < 0.5;
             let num;
 
-            // Generate numbers that are interesting (e.g., 199, 999, 1000, etc.)
+            // 50% of the time: generate carry-over situations
             if (Math.random() < 0.5) {
-                const bases = [99, 199, 299, 499, 999, 1999, 9999, 10000, 50000, 100000];
-                num = bases[randomInt(0, bases.length - 1)] + randomInt(-10, 10);
+                if (isNext) {
+                    // For "next": generate numbers ending in 999, 99, or 9
+                    const patterns = [
+                        () => randomInt(10, 999) * 1000 - 1,        // e.g., 319,999
+                        () => randomInt(100, 9999) * 100 - 1,       // e.g., 41,999
+                        () => randomInt(1000, 99999) * 10 - 1,      // e.g., 321,199 → 321,200
+                        () => randomInt(10000, 999999) - (randomInt(10000, 999999) % 10) + 9  // ends in 9
+                    ];
+                    num = patterns[randomInt(0, patterns.length - 1)]();
+                } else {
+                    // For "previous": generate numbers ending in 000, 00, or 0
+                    const patterns = [
+                        () => randomInt(11, 999) * 1000,            // e.g., 41,000
+                        () => randomInt(101, 9999) * 100,           // e.g., 42,100
+                        () => randomInt(1001, 99999) * 10,          // e.g., 321,200
+                        () => randomInt(10001, 999999) - (randomInt(10001, 999999) % 10)  // ends in 0
+                    ];
+                    num = patterns[randomInt(0, patterns.length - 1)]();
+                }
             } else {
+                // 50% of the time: generate regular numbers
                 num = randomInt(10000, 999999);
             }
 
@@ -591,7 +609,7 @@
                 feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
                 feedbackDiv.className = 'feedback correct show';
             } else {
-                feedbackDiv.textContent = `💪 המשך לנסות! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
+                feedbackDiv.textContent = `💙 המשך לנסות! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
                 feedbackDiv.className = 'feedback incorrect show';
             }
 
@@ -601,11 +619,41 @@
 
         // Exercise 4: Find midpoint
         function generateExercise4() {
-            const base = randomInt(10000, 900000);
-            const gap = randomInt(5, 50) * 1000;
-            const num1 = base;
-            const num2 = base + gap;
-            const answer = Math.floor((num1 + num2) / 2);
+            // Generate more rounded numbers for easier mental math
+            const patternType = randomInt(0, 3);
+            let num1, num2, answer;
+
+            if (patternType === 0) {
+                // Two consecutive thousands (e.g., 123,000 and 124,000)
+                const base = randomInt(100, 900) * 1000;
+                num1 = base;
+                num2 = base + 1000;
+                answer = base + 500;
+            } else if (patternType === 1) {
+                // Hundreds within a thousand (e.g., 144,500 and 144,700)
+                const base = randomInt(100, 900) * 1000;
+                const offset1 = randomInt(1, 8) * 100;
+                const offset2 = offset1 + 200;
+                num1 = base + offset1;
+                num2 = base + offset2;
+                answer = base + offset1 + 100;
+            } else if (patternType === 2) {
+                // Varied gaps in thousands (e.g., 240,000 and 248,000, or 340,000 and 352,000)
+                const base = randomInt(10, 90) * 10000;
+                const gaps = [2000, 4000, 6000, 8000, 10000, 12000, 14000];
+                const gap = gaps[randomInt(0, gaps.length - 1)];
+                num1 = base;
+                num2 = base + gap;
+                answer = base + (gap / 2);
+            } else {
+                // Varied gaps in thousands (e.g., 270,000 and 280,000)
+                const base = randomInt(20, 90) * 10000;
+                const gaps = [2000, 4000, 6000, 8000, 10000, 12000, 14000];
+                const gap = gaps[randomInt(0, gaps.length - 1)];
+                num1 = base;
+                num2 = base + gap;
+                answer = base + (gap / 2);
+            }
 
             state.currentQuestion = { num1, num2, answer };
 
@@ -638,7 +686,7 @@
                 feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
                 feedbackDiv.className = 'feedback correct show';
             } else {
-                feedbackDiv.textContent = `💪 כמעט הגעת! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
+                feedbackDiv.textContent = `💙 כמעט הגעת! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
                 feedbackDiv.className = 'feedback incorrect show';
             }
 
@@ -686,7 +734,7 @@
                 feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
                 feedbackDiv.className = 'feedback correct show';
             } else {
-                feedbackDiv.textContent = `💪 אתה בכיוון הנכון! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
+                feedbackDiv.textContent = `💙 אתה בכיוון הנכון! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
                 feedbackDiv.className = 'feedback incorrect show';
             }
 
