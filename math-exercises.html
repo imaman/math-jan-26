@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תרגילי מתמטיקה - כיתה ה'</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .menu-btn {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .exercise-container {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .exercise-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            min-width: 100px;
+        }
+
+        .option-btn:hover {
+            background: #f0f0ff;
+        }
+
+        .option-btn.selected {
+            background: #667eea;
+            color: white;
+        }
+
+        .option-btn.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .option-btn.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .input-area {
+            margin: 15px 0;
+        }
+
+        .answer-input {
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            width: 200px;
+            text-align: center;
+            direction: ltr;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .feedback.incorrect {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 20px;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 תרגילי מתמטיקה - כיתה ה'</h1>
+
+        <div id="menu" class="menu">
+            <button class="menu-btn" onclick="startExercise(1)">
+                סמן מספרים לפי ספרה
+            </button>
+            <button class="menu-btn" onclick="startExercise(2)">
+                הגדל ספרה במספר
+            </button>
+            <button class="menu-btn" onclick="startExercise(3)">
+                מספר הבא/קודם
+            </button>
+            <button class="menu-btn" onclick="startExercise(4)">
+                מצא נקודת אמצע
+            </button>
+            <button class="menu-btn" onclick="startExercise(5)">
+                עיגול מספרים
+            </button>
+        </div>
+
+        <!-- Exercise 1: Mark numbers with specific digit -->
+        <div id="exercise1" class="exercise-container">
+            <button class="btn btn-secondary back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score" id="score1">ניקוד: 0/0</div>
+            <div class="question" id="question1"></div>
+            <div class="options" id="options1"></div>
+            <button class="btn" onclick="checkExercise1()">בדוק תשובה</button>
+            <button class="btn btn-success" onclick="nextQuestion(1)" style="display:none;" id="next1">תרגיל הבא</button>
+            <div class="feedback" id="feedback1"></div>
+        </div>
+
+        <!-- Exercise 2: Increase digit -->
+        <div id="exercise2" class="exercise-container">
+            <button class="btn btn-secondary back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score" id="score2">ניקוד: 0/0</div>
+            <div class="question" id="question2"></div>
+            <div class="input-area">
+                <input type="text" class="answer-input" id="answer2" placeholder="הקלד תשובה">
+            </div>
+            <button class="btn" onclick="checkExercise2()">בדוק תשובה</button>
+            <button class="btn btn-success" onclick="nextQuestion(2)" style="display:none;" id="next2">תרגיל הבא</button>
+            <div class="feedback" id="feedback2"></div>
+        </div>
+
+        <!-- Exercise 3: Next/Previous number -->
+        <div id="exercise3" class="exercise-container">
+            <button class="btn btn-secondary back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score" id="score3">ניקוד: 0/0</div>
+            <div class="question" id="question3"></div>
+            <div class="input-area">
+                <input type="text" class="answer-input" id="answer3" placeholder="הקלד תשובה">
+            </div>
+            <button class="btn" onclick="checkExercise3()">בדוק תשובה</button>
+            <button class="btn btn-success" onclick="nextQuestion(3)" style="display:none;" id="next3">תרגיל הבא</button>
+            <div class="feedback" id="feedback3"></div>
+        </div>
+
+        <!-- Exercise 4: Find midpoint -->
+        <div id="exercise4" class="exercise-container">
+            <button class="btn btn-secondary back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score" id="score4">ניקוד: 0/0</div>
+            <div class="question" id="question4"></div>
+            <div class="input-area">
+                <input type="text" class="answer-input" id="answer4" placeholder="הקלד תשובה">
+            </div>
+            <button class="btn" onclick="checkExercise4()">בדוק תשובה</button>
+            <button class="btn btn-success" onclick="nextQuestion(4)" style="display:none;" id="next4">תרגיל הבא</button>
+            <div class="feedback" id="feedback4"></div>
+        </div>
+
+        <!-- Exercise 5: Rounding -->
+        <div id="exercise5" class="exercise-container">
+            <button class="btn btn-secondary back-btn" onclick="backToMenu()">← חזרה לתפריט</button>
+            <div class="score" id="score5">ניקוד: 0/0</div>
+            <div class="question" id="question5"></div>
+            <div class="input-area">
+                <input type="text" class="answer-input" id="answer5" placeholder="הקלד תשובה">
+            </div>
+            <button class="btn" onclick="checkExercise5()">בדוק תשובה</button>
+            <button class="btn btn-success" onclick="nextQuestion(5)" style="display:none;" id="next5">תרגיל הבא</button>
+            <div class="feedback" id="feedback5"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentExercise: null,
+            scores: {1: {correct: 0, total: 0}, 2: {correct: 0, total: 0}, 3: {correct: 0, total: 0}, 4: {correct: 0, total: 0}, 5: {correct: 0, total: 0}},
+            currentQuestion: {},
+            history: []
+        };
+
+        // Local Storage Functions
+        function loadHistory() {
+            const saved = localStorage.getItem('mathExerciseHistory');
+            if (saved) {
+                state.history = JSON.parse(saved);
+            }
+        }
+
+        function saveToHistory(exerciseType, questionData, userAnswer, correctAnswer, isCorrect) {
+            const entry = {
+                timestamp: new Date().toISOString(),
+                exerciseType,
+                questionData,
+                userAnswer,
+                correctAnswer,
+                isCorrect
+            };
+            state.history.push(entry);
+            localStorage.setItem('mathExerciseHistory', JSON.stringify(state.history));
+        }
+
+        // Load history on page load
+        loadHistory();
+
+        const digitNames = {
+            1: 'אחדות',
+            10: 'עשרות',
+            100: 'מאות',
+            1000: 'אלפים',
+            10000: 'עשרות אלפים',
+            100000: 'מאות אלפים'
+        };
+
+        function startExercise(num) {
+            document.getElementById('menu').style.display = 'none';
+            document.querySelectorAll('.exercise-container').forEach(el => el.classList.remove('active'));
+            document.getElementById('exercise' + num).classList.add('active');
+            state.currentExercise = num;
+            nextQuestion(num);
+        }
+
+        function backToMenu() {
+            document.getElementById('menu').style.display = 'grid';
+            document.querySelectorAll('.exercise-container').forEach(el => el.classList.remove('active'));
+            state.currentExercise = null;
+        }
+
+        function updateScore(exerciseNum) {
+            const score = state.scores[exerciseNum];
+            document.getElementById('score' + exerciseNum).textContent =
+                `ניקוד: ${score.correct}/${score.total}`;
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString('en-US');
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getDigitValue(num, place) {
+            return Math.floor((num / place) % 10);
+        }
+
+        function setDigitValue(num, place, newDigit) {
+            const currentDigit = getDigitValue(num, place);
+            return num + (newDigit - currentDigit) * place;
+        }
+
+        // Exercise 1: Mark numbers with specific digit
+        function generateExercise1() {
+            const places = [1, 10, 100, 1000, 10000];
+            const place = places[randomInt(0, places.length - 1)];
+            const targetDigit = randomInt(1, 9);
+            const count = 6;
+
+            const numbers = [];
+            const correctAnswers = new Set();
+
+            // Generate at least 2 correct answers
+            for (let i = 0; i < 2; i++) {
+                let num = randomInt(10000, 999999);
+                num = setDigitValue(num, place, targetDigit);
+                numbers.push(num);
+                correctAnswers.add(num);
+            }
+
+            // Fill the rest with random numbers
+            while (numbers.length < count) {
+                const num = randomInt(10000, 999999);
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                    if (getDigitValue(num, place) === targetDigit) {
+                        correctAnswers.add(num);
+                    }
+                }
+            }
+
+            // Shuffle
+            numbers.sort(() => Math.random() - 0.5);
+
+            state.currentQuestion = {
+                place,
+                targetDigit,
+                numbers,
+                correctAnswers,
+                selectedNumbers: new Set()
+            };
+
+            document.getElementById('question1').innerHTML =
+                `<strong>סמן את כל המספרים שהספרה ב${digitNames[place]} שלהם היא ${targetDigit}:</strong>`;
+
+            const optionsDiv = document.getElementById('options1');
+            optionsDiv.innerHTML = '';
+
+            numbers.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = formatNumber(num);
+                btn.onclick = () => toggleNumber(num, btn);
+                optionsDiv.appendChild(btn);
+            });
+
+            document.getElementById('feedback1').classList.remove('show');
+            document.getElementById('next1').style.display = 'none';
+            document.querySelector('#exercise1 .btn:not(.back-btn):not(.btn-success)').style.display = 'inline-block';
+        }
+
+        function toggleNumber(num, btn) {
+            if (state.currentQuestion.selectedNumbers.has(num)) {
+                state.currentQuestion.selectedNumbers.delete(num);
+                btn.classList.remove('selected');
+            } else {
+                state.currentQuestion.selectedNumbers.add(num);
+                btn.classList.add('selected');
+            }
+        }
+
+        function checkExercise1() {
+            const q = state.currentQuestion;
+            const selected = q.selectedNumbers;
+            const correct = q.correctAnswers;
+
+            let allCorrect = selected.size === correct.size;
+            selected.forEach(num => {
+                if (!correct.has(num)) allCorrect = false;
+            });
+
+            state.scores[1].total++;
+            if (allCorrect) state.scores[1].correct++;
+            updateScore(1);
+
+            // Save to history
+            saveToHistory(1, {
+                place: q.place,
+                targetDigit: q.targetDigit,
+                numbers: q.numbers,
+                correctAnswers: Array.from(q.correctAnswers)
+            }, Array.from(selected), Array.from(correct), allCorrect);
+
+            // Show feedback on buttons
+            const buttons = document.querySelectorAll('#options1 .option-btn');
+            buttons.forEach(btn => {
+                const num = parseInt(btn.textContent.replace(/,/g, ''));
+                btn.onclick = null;
+
+                if (correct.has(num)) {
+                    btn.classList.add('correct');
+                } else if (selected.has(num)) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            const feedbackDiv = document.getElementById('feedback1');
+            if (allCorrect) {
+                feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
+                feedbackDiv.className = 'feedback correct show';
+            } else {
+                feedbackDiv.textContent = '💪 כמעט! נסה שוב בתרגיל הבא!';
+                feedbackDiv.className = 'feedback incorrect show';
+            }
+
+            document.querySelector('#exercise1 .btn:not(.back-btn):not(.btn-success)').style.display = 'none';
+            document.getElementById('next1').style.display = 'inline-block';
+        }
+
+        // Exercise 2: Increase digit
+        function generateExercise2() {
+            const places = [1, 10, 100, 1000, 10000];
+            const place = places[randomInt(0, places.length - 1)];
+            const num = randomInt(100000, 999999);
+            const increase = randomInt(1, 5);
+
+            const currentDigit = getDigitValue(num, place);
+            const newDigit = (currentDigit + increase) % 10;
+            const answer = setDigitValue(num, place, newDigit);
+
+            state.currentQuestion = { place, num, increase, answer };
+
+            document.getElementById('question2').innerHTML =
+                `<strong>הגדל את ספרת ה${digitNames[place]} של המספר ${formatNumber(num)} ב-${increase}:</strong>`;
+
+            document.getElementById('answer2').value = '';
+            document.getElementById('feedback2').classList.remove('show');
+            document.getElementById('next2').style.display = 'none';
+            document.querySelector('#exercise2 .btn:not(.back-btn):not(.btn-success)').style.display = 'inline-block';
+        }
+
+        function checkExercise2() {
+            const userAnswer = parseInt(document.getElementById('answer2').value.replace(/,/g, ''));
+            const correctAnswer = state.currentQuestion.answer;
+
+            state.scores[2].total++;
+            const isCorrect = userAnswer === correctAnswer;
+            if (isCorrect) state.scores[2].correct++;
+            updateScore(2);
+
+            // Save to history
+            saveToHistory(2, {
+                place: state.currentQuestion.place,
+                num: state.currentQuestion.num,
+                increase: state.currentQuestion.increase
+            }, userAnswer, correctAnswer, isCorrect);
+
+            const feedbackDiv = document.getElementById('feedback2');
+            if (isCorrect) {
+                feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
+                feedbackDiv.className = 'feedback correct show';
+            } else {
+                feedbackDiv.textContent = `💪 ניסיון טוב! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
+                feedbackDiv.className = 'feedback incorrect show';
+            }
+
+            document.querySelector('#exercise2 .btn:not(.back-btn):not(.btn-success)').style.display = 'none';
+            document.getElementById('next2').style.display = 'inline-block';
+        }
+
+        // Exercise 3: Next/Previous number
+        function generateExercise3() {
+            const isNext = Math.random() < 0.5;
+            let num;
+
+            // Generate numbers that are interesting (e.g., 199, 999, 1000, etc.)
+            if (Math.random() < 0.5) {
+                const bases = [99, 199, 299, 499, 999, 1999, 9999, 10000, 50000, 100000];
+                num = bases[randomInt(0, bases.length - 1)] + randomInt(-10, 10);
+            } else {
+                num = randomInt(10000, 999999);
+            }
+
+            const answer = isNext ? num + 1 : num - 1;
+
+            state.currentQuestion = { num, isNext, answer };
+
+            const questionText = isNext ?
+                `<strong>מהו המספר שבא אחרי ${formatNumber(num)}?</strong>` :
+                `<strong>מהו המספר שבא לפני ${formatNumber(num)}?</strong>`;
+
+            document.getElementById('question3').innerHTML = questionText;
+            document.getElementById('answer3').value = '';
+            document.getElementById('feedback3').classList.remove('show');
+            document.getElementById('next3').style.display = 'none';
+            document.querySelector('#exercise3 .btn:not(.back-btn):not(.btn-success)').style.display = 'inline-block';
+        }
+
+        function checkExercise3() {
+            const userAnswer = parseInt(document.getElementById('answer3').value.replace(/,/g, ''));
+            const correctAnswer = state.currentQuestion.answer;
+
+            state.scores[3].total++;
+            const isCorrect = userAnswer === correctAnswer;
+            if (isCorrect) state.scores[3].correct++;
+            updateScore(3);
+
+            // Save to history
+            saveToHistory(3, {
+                num: state.currentQuestion.num,
+                isNext: state.currentQuestion.isNext
+            }, userAnswer, correctAnswer, isCorrect);
+
+            const feedbackDiv = document.getElementById('feedback3');
+            if (isCorrect) {
+                feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
+                feedbackDiv.className = 'feedback correct show';
+            } else {
+                feedbackDiv.textContent = `💪 המשך לנסות! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
+                feedbackDiv.className = 'feedback incorrect show';
+            }
+
+            document.querySelector('#exercise3 .btn:not(.back-btn):not(.btn-success)').style.display = 'none';
+            document.getElementById('next3').style.display = 'inline-block';
+        }
+
+        // Exercise 4: Find midpoint
+        function generateExercise4() {
+            const base = randomInt(10000, 900000);
+            const gap = randomInt(5, 50) * 1000;
+            const num1 = base;
+            const num2 = base + gap;
+            const answer = Math.floor((num1 + num2) / 2);
+
+            state.currentQuestion = { num1, num2, answer };
+
+            document.getElementById('question4').innerHTML =
+                `<strong>מהי נקודת האמצע בין ${formatNumber(num1)} ל-${formatNumber(num2)}?</strong>`;
+
+            document.getElementById('answer4').value = '';
+            document.getElementById('feedback4').classList.remove('show');
+            document.getElementById('next4').style.display = 'none';
+            document.querySelector('#exercise4 .btn:not(.back-btn):not(.btn-success)').style.display = 'inline-block';
+        }
+
+        function checkExercise4() {
+            const userAnswer = parseInt(document.getElementById('answer4').value.replace(/,/g, ''));
+            const correctAnswer = state.currentQuestion.answer;
+
+            state.scores[4].total++;
+            const isCorrect = userAnswer === correctAnswer;
+            if (isCorrect) state.scores[4].correct++;
+            updateScore(4);
+
+            // Save to history
+            saveToHistory(4, {
+                num1: state.currentQuestion.num1,
+                num2: state.currentQuestion.num2
+            }, userAnswer, correctAnswer, isCorrect);
+
+            const feedbackDiv = document.getElementById('feedback4');
+            if (isCorrect) {
+                feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
+                feedbackDiv.className = 'feedback correct show';
+            } else {
+                feedbackDiv.textContent = `💪 כמעט הגעת! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
+                feedbackDiv.className = 'feedback incorrect show';
+            }
+
+            document.querySelector('#exercise4 .btn:not(.back-btn):not(.btn-success)').style.display = 'none';
+            document.getElementById('next4').style.display = 'inline-block';
+        }
+
+        // Exercise 5: Rounding
+        function generateExercise5() {
+            const roundOptions = [100, 1000, 10000];
+            const roundTo = roundOptions[randomInt(0, roundOptions.length - 1)];
+            const num = randomInt(100000, 999999);
+            const answer = Math.round(num / roundTo) * roundTo;
+
+            state.currentQuestion = { num, roundTo, answer };
+
+            const roundToText = roundTo === 100 ? 'מאות' : roundTo === 1000 ? 'אלפים' : 'עשרות אלפים';
+
+            document.getElementById('question5').innerHTML =
+                `<strong>עגל את המספר ${formatNumber(num)} ל-${roundToText} (${formatNumber(roundTo)}):</strong>`;
+
+            document.getElementById('answer5').value = '';
+            document.getElementById('feedback5').classList.remove('show');
+            document.getElementById('next5').style.display = 'none';
+            document.querySelector('#exercise5 .btn:not(.back-btn):not(.btn-success)').style.display = 'inline-block';
+        }
+
+        function checkExercise5() {
+            const userAnswer = parseInt(document.getElementById('answer5').value.replace(/,/g, ''));
+            const correctAnswer = state.currentQuestion.answer;
+
+            state.scores[5].total++;
+            const isCorrect = userAnswer === correctAnswer;
+            if (isCorrect) state.scores[5].correct++;
+            updateScore(5);
+
+            // Save to history
+            saveToHistory(5, {
+                num: state.currentQuestion.num,
+                roundTo: state.currentQuestion.roundTo
+            }, userAnswer, correctAnswer, isCorrect);
+
+            const feedbackDiv = document.getElementById('feedback5');
+            if (isCorrect) {
+                feedbackDiv.textContent = '🎉 מצוין! תשובה נכונה!';
+                feedbackDiv.className = 'feedback correct show';
+            } else {
+                feedbackDiv.textContent = `💪 אתה בכיוון הנכון! התשובה הנכונה היא: ${formatNumber(correctAnswer)}`;
+                feedbackDiv.className = 'feedback incorrect show';
+            }
+
+            document.querySelector('#exercise5 .btn:not(.back-btn):not(.btn-success)').style.display = 'none';
+            document.getElementById('next5').style.display = 'inline-block';
+        }
+
+        // Next question dispatcher
+        function nextQuestion(exerciseNum) {
+            switch(exerciseNum) {
+                case 1: generateExercise1(); break;
+                case 2: generateExercise2(); break;
+                case 3: generateExercise3(); break;
+                case 4: generateExercise4(); break;
+                case 5: generateExercise5(); break;
+            }
+        }
+
+        // Add Enter key support for input fields
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('answer2').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkExercise2();
+            });
+            document.getElementById('answer3').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkExercise3();
+            });
+            document.getElementById('answer4').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkExercise4();
+            });
+            document.getElementById('answer5').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkExercise5();
+            });
+        });
+    </script>
+</body>
+</html>
