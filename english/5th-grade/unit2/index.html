@@ -100,7 +100,7 @@ body{
 .fc-word{font-size:2.5em;font-weight:900;text-align:center}
 .fc-tap-hint{font-size:0.85em;opacity:0.7;margin-top:15px}
 .fc-back-emoji{font-size:2.2em;margin-bottom:8px}
-.fc-definition{font-size:1.3em;font-weight:700;color:var(--primary);text-align:center;margin-bottom:12px}
+.fc-definition{font-size:1.3em;font-weight:700;color:var(--primary);text-align:center;margin-bottom:12px;direction:rtl}
 .fc-example{font-size:1em;color:var(--text-light);text-align:center;font-style:italic}
 .fc-category-badge{
   display:inline-block;background:var(--primary);color:#fff;padding:4px 14px;
@@ -607,7 +607,7 @@ function renderFlashcard() {
   document.getElementById('fcEmoji').textContent = w.emoji;
   document.getElementById('fcWord').textContent = w.word;
   document.getElementById('fcBackEmoji').textContent = w.emoji;
-  document.getElementById('fcDefinition').textContent = w.def;
+  document.getElementById('fcDefinition').textContent = w.he;
   document.getElementById('fcExample').textContent = '"' + w.example + '"';
   document.getElementById('fcCatBadge').textContent = w.cat;
   document.getElementById('fcCounter').textContent = (fcIndex + 1) + ' / ' + fcWords.length;
@@ -641,7 +641,7 @@ function initMemory() {
   mmCards = [];
   shuffled.forEach((w, i) => {
     mmCards.push({ id: i * 2, pairId: i, type: 'word', text: w.emoji + ' ' + w.word });
-    mmCards.push({ id: i * 2 + 1, pairId: i, type: 'def', text: w.short });
+    mmCards.push({ id: i * 2 + 1, pairId: i, type: 'def', text: w.he });
   });
   mmCards.sort(() => Math.random() - 0.5);
 
@@ -772,7 +772,7 @@ function nextScramble() {
   });
 
   // Show number of words hint for multi-word entries
-  let hint = scCurrentWord.emoji + '  ' + scCurrentWord.def;
+  let hint = scCurrentWord.emoji + '  ' + scCurrentWord.he;
   const wordCount = scCurrentWord.word.split(/[\s-]+/).length;
   if (wordCount > 1) {
     const wordLengths = scCurrentWord.word.split(/[\s-]/).map(w => w.length).join(', ');
@@ -868,7 +868,7 @@ function renderQuizQuestion() {
   const progress = ((qzIndex) / qzTotal) * 100;
   document.getElementById('qzProgressBar').style.width = progress + '%';
   document.getElementById('qzNum').textContent = `Question ${qzIndex + 1} of ${qzTotal}`;
-  document.getElementById('qzDefinition').textContent = q.correct.emoji + '  ' + q.correct.def;
+  document.getElementById('qzDefinition').textContent = q.correct.emoji + '  ' + q.correct.he;
 
   const optContainer = document.getElementById('qzOptions');
   optContainer.innerHTML = '';
