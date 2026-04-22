@@ -166,32 +166,54 @@ body{
   margin:0 auto;box-shadow:0 15px 40px rgba(0,0,0,0.2);text-align:center;
 }
 .sc-hint{color:var(--text-light);font-size:1.1em;margin-bottom:20px;font-weight:600}
-.sc-letters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:25px}
+
+.sc-solution{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:18px;margin-bottom:22px;min-height:54px;
+}
+.sc-solution.shake{animation:shake 0.5s}
+.sc-word-group{display:flex;gap:6px}
+.sc-slot{
+  width:40px;height:48px;border-radius:10px;border:3px dashed #d0d0d0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4em;font-weight:900;color:var(--text);
+  background:#fafafa;transition:all 0.25s;
+}
+.sc-slot.filled{border-style:solid;border-color:var(--primary);background:#f0efff;color:var(--primary)}
+.sc-slot.correct-pos{border-style:solid;border-color:var(--success);background:#d5fff1;color:#008e74}
+.sc-slot.all-correct{border-style:solid;border-color:var(--success);background:#c5f7e6;color:#008e74}
+
+.sc-letters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:22px}
 .sc-letter{
   width:45px;height:50px;background:linear-gradient(135deg,var(--primary),var(--primary-light));
   color:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;
   font-size:1.5em;font-weight:900;box-shadow:0 4px 10px rgba(108,99,255,0.3);
   animation:popIn 0.3s ease backwards;
+  cursor:pointer;user-select:none;transition:transform 0.15s,opacity 0.2s,background 0.25s,color 0.25s,box-shadow 0.25s;
+}
+.sc-letter:hover{transform:translateY(-3px)}
+.sc-letter:active{transform:translateY(0)}
+.sc-letter.used{
+  background:#ececec;color:#b5b5b5;box-shadow:none;cursor:default;pointer-events:none;
 }
 @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-
-.sc-input-row{display:flex;gap:10px;justify-content:center;margin-bottom:15px}
-.sc-input{
-  flex:1;max-width:300px;padding:14px 20px;border-radius:15px;border:3px solid #e0e0e0;
-  font-family:inherit;font-size:1.2em;font-weight:700;text-align:center;
-  outline:none;transition:border-color 0.3s;
-}
-.sc-input:focus{border-color:var(--primary)}
-.sc-input.correct{border-color:var(--success);background:#e8fff8}
-.sc-input.wrong{border-color:var(--danger);background:#fff0f0;animation:shake 0.5s}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+
+.sc-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:5px}
+.sc-backspace{
+  width:50px;height:50px;padding:0;border-radius:15px;border:none;background:#eee;color:var(--text);
+  font-family:inherit;font-size:1.3em;font-weight:800;cursor:pointer;transition:all 0.3s;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.sc-backspace:hover:not(:disabled){background:#ddd;transform:translateY(-2px)}
+.sc-backspace:disabled{opacity:0.45;cursor:not-allowed}
 
 .sc-submit{
   padding:14px 30px;border-radius:15px;border:none;background:var(--primary);
   color:#fff;font-family:inherit;font-size:1.1em;font-weight:800;cursor:pointer;
   transition:all 0.3s;
 }
-.sc-submit:hover{background:var(--primary-light);transform:translateY(-2px)}
+.sc-submit:hover:not(:disabled){background:var(--primary-light);transform:translateY(-2px)}
+.sc-submit:disabled{opacity:0.45;cursor:not-allowed}
 .sc-feedback{margin-top:15px;font-weight:700;font-size:1.1em;min-height:30px}
 .sc-feedback.correct{color:var(--success)}
 .sc-feedback.wrong{color:var(--danger)}
@@ -372,10 +394,11 @@ body{
   </div>
   <div class="sc-card">
     <div class="sc-hint" id="scHint"></div>
+    <div class="sc-solution" id="scSolution"></div>
     <div class="sc-letters" id="scLetters"></div>
-    <div class="sc-input-row">
-      <input class="sc-input" id="scInput" placeholder="Type the word..." autocomplete="off" autocapitalize="off" spellcheck="false">
-      <button class="sc-submit" onclick="checkScramble()">Go!</button>
+    <div class="sc-actions">
+      <button class="sc-backspace" id="scBackspace" onclick="scBackspace()" aria-label="Backspace" title="Backspace">&#9003;</button>
+      <button class="sc-submit" id="scSubmit" onclick="checkScramble()">Go!</button>
     </div>
     <div class="sc-feedback" id="scFeedback"></div>
     <button class="sc-skip" onclick="skipScramble()">Skip this word</button>
@@ -725,21 +748,22 @@ function mmFlipCard(idx, el) {
 
 // =================== SCRAMBLE ===================
 let scScore = 0, scStreak = 0, scCurrentWord = null, scUsed = new Set();
+let scLetterTiles = [];      // [{letter, used}]
+let scSlotFills = [];        // [{letter, sourceIndex}] in user-entered order
+let scTargetLetters = '';    // answer with non-letters stripped, lowercase
+let scWordGroupSizes = [];   // e.g. [3, 5] for "ice cream"
+let scFeedbackTimer = null;
 
 function initScramble() {
   scScore = 0; scStreak = 0; scUsed.clear();
   document.getElementById('scScore').textContent = '0';
   document.getElementById('scStreak').textContent = '0';
   nextScramble();
-  const input = document.getElementById('scInput');
-  input.onkeydown = (e) => { if (e.key === 'Enter') checkScramble(); };
 }
 
 function scrambleWord(word) {
-  // Only scramble letters (keep spaces/hyphens in place? No - flatten to letters and scramble)
   const clean = word.replace(/[^a-zA-Z]/g, '');
   let letters = clean.split('');
-  // Ensure it's actually scrambled
   for (let attempts = 0; attempts < 50; attempts++) {
     for (let i = letters.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -751,7 +775,8 @@ function scrambleWord(word) {
 }
 
 function nextScramble() {
-  // Filter out multi-word phrases longer than 15 chars for playability
+  if (scFeedbackTimer) { clearTimeout(scFeedbackTimer); scFeedbackTimer = null; }
+
   const available = words.filter(w => !scUsed.has(w.word) && w.word.replace(/[^a-zA-Z]/g, '').length >= 2);
   if (available.length === 0) {
     scUsed.clear();
@@ -760,68 +785,161 @@ function nextScramble() {
   scCurrentWord = available[Math.floor(Math.random() * available.length)];
   scUsed.add(scCurrentWord.word);
 
-  const letters = scrambleWord(scCurrentWord.word);
-  const lettersDiv = document.getElementById('scLetters');
-  lettersDiv.innerHTML = '';
-  letters.forEach((letter, i) => {
-    const span = document.createElement('div');
-    span.className = 'sc-letter';
-    span.textContent = letter.toUpperCase();
-    span.style.animationDelay = (i * 0.05) + 's';
-    lettersDiv.appendChild(span);
-  });
+  scTargetLetters = scCurrentWord.word.replace(/[^a-zA-Z]/g, '').toLowerCase();
+  scWordGroupSizes = scCurrentWord.word.split(/[\s-]+/).filter(Boolean).map(w => w.length);
 
-  // Show number of words hint for multi-word entries
+  scLetterTiles = scrambleWord(scCurrentWord.word).map(l => ({ letter: l, used: false }));
+  scSlotFills = [];
+
   let hint = scCurrentWord.emoji + '  ' + scCurrentWord.he;
-  const wordCount = scCurrentWord.word.split(/[\s-]+/).length;
-  if (wordCount > 1) {
-    const wordLengths = scCurrentWord.word.split(/[\s-]/).map(w => w.length).join(', ');
-    hint += ` (${wordCount} words: ${wordLengths} letters)`;
+  if (scWordGroupSizes.length > 1) {
+    hint += ` (${scWordGroupSizes.length} words: ${scWordGroupSizes.join(', ')} letters)`;
   }
   document.getElementById('scHint').textContent = hint;
 
-  const input = document.getElementById('scInput');
-  input.value = '';
-  input.className = 'sc-input';
-  input.focus();
-  document.getElementById('scFeedback').textContent = '';
-  document.getElementById('scFeedback').className = 'sc-feedback';
+  const feedback = document.getElementById('scFeedback');
+  feedback.textContent = '';
+  feedback.className = 'sc-feedback';
+
+  buildScrambleLetters();
+  renderScrambleSolution();
+  updateScrambleActions();
+}
+
+// Build letter tiles fresh for a new word (runs the staggered popIn animation once).
+function buildScrambleLetters() {
+  const lettersDiv = document.getElementById('scLetters');
+  lettersDiv.innerHTML = '';
+  scLetterTiles.forEach((tile, i) => {
+    const el = document.createElement('div');
+    el.className = 'sc-letter';
+    el.textContent = tile.letter.toUpperCase();
+    el.style.animationDelay = (i * 0.05) + 's';
+    el.onclick = () => scPlaceLetter(i);
+    lettersDiv.appendChild(el);
+  });
+}
+
+// Sync existing tile elements with current used-state — CSS transition handles the fade.
+function syncScrambleLetters() {
+  const children = document.getElementById('scLetters').children;
+  scLetterTiles.forEach((tile, i) => {
+    const el = children[i];
+    if (el) el.classList.toggle('used', tile.used);
+  });
+}
+
+function renderScrambleSolution(positionalHighlight) {
+  const solDiv = document.getElementById('scSolution');
+  solDiv.innerHTML = '';
+  let slotIndex = 0;
+  scWordGroupSizes.forEach(size => {
+    const group = document.createElement('div');
+    group.className = 'sc-word-group';
+    for (let i = 0; i < size; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'sc-slot';
+      const fill = scSlotFills[slotIndex];
+      if (fill) {
+        slot.textContent = fill.letter.toUpperCase();
+        const matchesPosition = fill.letter.toLowerCase() === scTargetLetters[slotIndex];
+        if (positionalHighlight === 'all') {
+          slot.classList.add('all-correct');
+        } else if (positionalHighlight === 'partial' && matchesPosition) {
+          slot.classList.add('correct-pos');
+        } else {
+          slot.classList.add('filled');
+        }
+      }
+      group.appendChild(slot);
+      slotIndex++;
+    }
+    solDiv.appendChild(group);
+  });
+}
+
+function updateScrambleActions() {
+  document.getElementById('scBackspace').disabled = scSlotFills.length === 0;
+  document.getElementById('scSubmit').disabled = scSlotFills.length === 0;
+}
+
+function scPlaceLetter(tileIndex) {
+  if (scLetterTiles[tileIndex].used) return;
+  if (scSlotFills.length >= scTargetLetters.length) return;
+  cancelPendingFeedback();
+  scLetterTiles[tileIndex].used = true;
+  scSlotFills.push({ letter: scLetterTiles[tileIndex].letter, sourceIndex: tileIndex });
+  syncScrambleLetters();
+  renderScrambleSolution();
+  updateScrambleActions();
+  playSound('flip');
+}
+
+function scBackspace() {
+  if (scSlotFills.length === 0) return;
+  cancelPendingFeedback();
+  const last = scSlotFills.pop();
+  scLetterTiles[last.sourceIndex].used = false;
+  syncScrambleLetters();
+  renderScrambleSolution();
+  updateScrambleActions();
+}
+
+// Called when the student edits while a wrong-answer highlight is showing.
+// Cancels the pending auto-reset and drops feedback text, but keeps their slots intact.
+function cancelPendingFeedback() {
+  if (scFeedbackTimer) { clearTimeout(scFeedbackTimer); scFeedbackTimer = null; }
+  const feedback = document.getElementById('scFeedback');
+  feedback.textContent = '';
+  feedback.className = 'sc-feedback';
+}
+
+// Called on timeout expiry after a wrong submission: wipe slots so the student starts fresh.
+function clearScrambleAttempt() {
+  scFeedbackTimer = null;
+  const feedback = document.getElementById('scFeedback');
+  feedback.textContent = '';
+  feedback.className = 'sc-feedback';
+  scSlotFills = [];
+  scLetterTiles.forEach(t => { t.used = false; });
+  syncScrambleLetters();
+  renderScrambleSolution();
+  updateScrambleActions();
 }
 
 function checkScramble() {
-  const input = document.getElementById('scInput');
-  const answer = input.value.trim().toLowerCase();
-  const correct = scCurrentWord.word.toLowerCase();
+  if (scSlotFills.length === 0) return;
+  const answer = scSlotFills.map(f => f.letter).join('').toLowerCase();
 
-  if (!answer) return;
-
-  if (answer === correct) {
-    input.className = 'sc-input correct';
+  if (answer === scTargetLetters) {
     scScore += (scStreak + 1) * 10;
     scStreak++;
     document.getElementById('scScore').textContent = scScore;
     document.getElementById('scStreak').textContent = scStreak;
-    document.getElementById('scFeedback').textContent = getEncouragement();
-    document.getElementById('scFeedback').className = 'sc-feedback correct';
+    const feedback = document.getElementById('scFeedback');
+    feedback.textContent = getEncouragement();
+    feedback.className = 'sc-feedback correct';
+    renderScrambleSolution('all');
     playSound('correct');
     if (scStreak % 5 === 0) launchConfetti();
     setTimeout(nextScramble, 1200);
   } else {
-    input.className = 'sc-input wrong';
     scStreak = 0;
     document.getElementById('scStreak').textContent = '0';
-    document.getElementById('scFeedback').textContent = 'Not quite! Try again...';
-    document.getElementById('scFeedback').className = 'sc-feedback wrong';
+    const feedback = document.getElementById('scFeedback');
+    feedback.textContent = 'Not quite! Green letters are in the right spot.';
+    feedback.className = 'sc-feedback wrong';
+    renderScrambleSolution('partial');
+    const sol = document.getElementById('scSolution');
+    sol.classList.add('shake');
+    setTimeout(() => sol.classList.remove('shake'), 500);
     playSound('wrong');
-    setTimeout(() => {
-      input.className = 'sc-input';
-      input.value = '';
-      input.focus();
-    }, 800);
+    scFeedbackTimer = setTimeout(clearScrambleAttempt, 2200);
   }
 }
 
 function skipScramble() {
+  if (scFeedbackTimer) { clearTimeout(scFeedbackTimer); scFeedbackTimer = null; }
   const feedback = document.getElementById('scFeedback');
   feedback.textContent = 'The answer was: ' + scCurrentWord.word;
   feedback.className = 'sc-feedback wrong';
