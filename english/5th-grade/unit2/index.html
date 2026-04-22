@@ -664,7 +664,7 @@ function initMemory() {
   const shuffled = [...words].sort(() => Math.random() - 0.5).slice(0, 8);
   mmCards = [];
   shuffled.forEach((w, i) => {
-    mmCards.push({ id: i * 2, pairId: i, type: 'word', text: w.emoji + ' ' + w.word });
+    mmCards.push({ id: i * 2, pairId: i, type: 'word', text: w.word });
     mmCards.push({ id: i * 2 + 1, pairId: i, type: 'def', text: w.he });
   });
   mmCards.sort(() => Math.random() - 0.5);
