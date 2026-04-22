@@ -188,12 +188,13 @@ body{
   color:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;
   font-size:1.5em;font-weight:900;box-shadow:0 4px 10px rgba(108,99,255,0.3);
   animation:popIn 0.3s ease backwards;
-  cursor:pointer;user-select:none;transition:transform 0.15s,opacity 0.2s,background 0.25s,color 0.25s,box-shadow 0.25s;
+  cursor:pointer;user-select:none;
+  transition:transform 0.15s ease,opacity 0.5s ease-out,filter 0.5s ease-out,box-shadow 0.5s ease-out;
 }
 .sc-letter:hover{transform:translateY(-3px)}
 .sc-letter:active{transform:translateY(0)}
 .sc-letter.used{
-  background:#ececec;color:#b5b5b5;box-shadow:none;cursor:default;pointer-events:none;
+  opacity:0.35;filter:grayscale(0.6);box-shadow:none;cursor:default;pointer-events:none;
 }
 @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
