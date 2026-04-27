@@ -425,6 +425,45 @@ const clozeItems = [
   {sentence:"It ___ raining.",answer:"is",options:["am","is","are"],cat:"To Be"},
   {sentence:"They ___ cousins.",answer:"are",options:["am","is","are"],cat:"To Be"},
   {sentence:"You ___ my friend.",answer:"are",options:["am","is","are"],cat:"To Be"},
+  {sentence:"I ___ happy today.",answer:"am",options:["am","is","are"],cat:"To Be"},
+  {sentence:"I ___ ten years old.",answer:"am",options:["am","is","are"],cat:"To Be"},
+  {sentence:"I ___ in 5th grade.",answer:"am",options:["am","is","are"],cat:"To Be"},
+  {sentence:"I ___ from Israel.",answer:"am",options:["am","is","are"],cat:"To Be"},
+  {sentence:"I ___ hungry.",answer:"am",options:["am","is","are"],cat:"To Be"},
+  {sentence:"I ___ ready for school.",answer:"am",options:["am","is","are"],cat:"To Be"},
+  // Negatives
+  {sentence:"I ___ not tired.",answer:"am",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"He ___ not tired.",answer:"is",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"We ___ not tired.",answer:"are",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"She ___ not at home.",answer:"is",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"They ___ not ready.",answer:"are",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"You ___ not late.",answer:"are",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"It ___ not cold today.",answer:"is",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"I ___ not hungry.",answer:"am",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"The dogs ___ not big.",answer:"are",options:["am","is","are"],cat:"Negatives"},
+  {sentence:"My sister ___ not here.",answer:"is",options:["am","is","are"],cat:"Negatives"},
+  // Questions
+  {sentence:"___ you tall?",answer:"are",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ she happy?",answer:"is",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ they friends?",answer:"are",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ I right?",answer:"am",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ he a doctor?",answer:"is",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ we late?",answer:"are",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ it raining?",answer:"is",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ the cookies fresh?",answer:"are",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ your brother ten?",answer:"is",options:["am","is","are"],cat:"Questions"},
+  {sentence:"___ you my new teacher?",answer:"are",options:["am","is","are"],cat:"Questions"},
+  // Imperatives
+  {sentence:"___ your vegetables.",answer:"eat",options:["eat","eats","eating"],cat:"Imperatives"},
+  {sentence:"Don't ___ fast food.",answer:"eat",options:["eat","eats","ate"],cat:"Imperatives"},
+  {sentence:"___ run in the hallway.",answer:"don't",options:["don't","not","no"],cat:"Imperatives"},
+  {sentence:"Please ___ quiet in class.",answer:"be",options:["be","is","are"],cat:"Imperatives"},
+  {sentence:"Don't ___ late for school.",answer:"be",options:["be","is","are"],cat:"Imperatives"},
+  {sentence:"___ your homework every day.",answer:"do",options:["do","does","doing"],cat:"Imperatives"},
+  {sentence:"Don't ___ in the library.",answer:"talk",options:["talk","talks","talking"],cat:"Imperatives"},
+  {sentence:"___ your hands before dinner.",answer:"wash",options:["wash","washes","washing"],cat:"Imperatives"},
+  {sentence:"Don't ___ the door.",answer:"open",options:["open","opens","opened"],cat:"Imperatives"},
+  {sentence:"___ careful on the stairs.",answer:"be",options:["be","is","are"],cat:"Imperatives"},
   // Possessives
   {sentence:"Sara talks to ___ mother.",answer:"her",options:["his","her","your"],cat:"His/Her/Your"},
   {sentence:"Don't forget to bring ___ hat.",answer:"your",options:["his","her","your"],cat:"His/Her/Your"},
@@ -465,7 +504,7 @@ const clozeItems = [
   {sentence:"It is difficult to find a food that ___ likes.",answer:"everyone",options:["enjoy","everyone","friendly"],cat:"Word Bank"},
   {sentence:"I ___ the weather in the spring.",answer:"enjoy",options:["enjoy","try","different"],cat:"Word Bank"},
 ];
-const clozeCategories = ["All","To Be","His/Her/Your","A or An","How Many?","Word Bank"];
+const clozeCategories = ["All","To Be","Negatives","Questions","Imperatives","His/Her/Your","A or An","How Many?","Word Bank"];
 
 const flipItems = [
   {prompt:"It is wet.",answer:["it","is","not","dry"]},
