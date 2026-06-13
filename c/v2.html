@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clips</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #eceae6;
+        --surface: #f6f5f3;
+        --ink: #1f2120;
+        --muted: #6f726e;
+        --line: #cfcdc7;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Hanken Grotesk", sans-serif;
+        line-height: 1.45;
+        -webkit-font-smoothing: antialiased;
+        padding: clamp(1.5rem, 4vw, 3rem);
+      }
+
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        border: 1px solid var(--line);
+        background: var(--surface);
+      }
+
+      .masthead {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.1rem 1.4rem;
+        border-bottom: 1px solid var(--line);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.74rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .masthead strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      @media (max-width: 760px) {
+        .grid { grid-template-columns: 1fr; }
+      }
+
+      .cell {
+        padding: 1.4rem;
+      }
+      .cell + .cell {
+        border-left: 1px solid var(--line);
+      }
+      @media (max-width: 760px) {
+        .cell + .cell {
+          border-left: 0;
+          border-top: 1px solid var(--line);
+        }
+      }
+
+      .label {
+        display: flex;
+        align-items: baseline;
+        gap: 0.7rem;
+        margin-bottom: 1rem;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .label .idx {
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .label .name {
+        font-family: "Hanken Grotesk", sans-serif;
+        font-weight: 600;
+        font-size: 1.05rem;
+        letter-spacing: -0.01em;
+      }
+      .label .dur {
+        margin-left: auto;
+        font-size: 0.74rem;
+        color: var(--muted);
+      }
+
+      .frame {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        background: #000;
+        border: 1px solid var(--line);
+      }
+      .frame iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="masthead">
+        <span><strong>Reference Clips</strong></span>
+        <span>02 items</span>
+      </div>
+      <div class="grid">
+        <div class="cell">
+          <div class="label">
+            <span class="idx">01</span>
+            <span class="name">Clip One</span>
+            <span class="dur">00:38</span>
+          </div>
+          <div class="frame">
+            <iframe
+              src="https://www.youtube.com/embed/ry-Brbyi20k?end=38"
+              title="Clip 1"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+        <div class="cell">
+          <div class="label">
+            <span class="idx">02</span>
+            <span class="name">Clip Two</span>
+            <span class="dur">00:59</span>
+          </div>
+          <div class="frame">
+            <iframe
+              src="https://www.youtube.com/embed/J4J-Fuo0vLE?end=59"
+              title="Clip 2"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
